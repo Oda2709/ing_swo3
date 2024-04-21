@@ -1,83 +1,62 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:cafe_1/paginas/historial.dart';
+import 'package:cafe_1/services/firebase_services.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:cafe_1/paginas/menu.dart';
 import 'package:cafe_1/paginas/registro.dart';
 import 'package:flutter/material.dart';
-import 'package:mysql1/mysql1.dart';
 
-void main() {
+//editado para firebase Future
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Assuming you have an Image widget named 'myImage' defined elsewhere
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'C_H2O Cafe',
-      home: LoginPage(), // Replace with your login page widget
-      theme: ThemeData(),
+      home: Login(),
     );
   }
 }
 
-class LoginPage extends StatefulWidget {
+class Login extends StatefulWidget {
+  const Login({
+    super.key,
+  });
+
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<Login> createState() => _LoginState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
-  String _cedula = '';
-  String _contrasena = '';
-
-  static const String host = '127.0.1.1';
-  static const int port = 3306;
-  static const String user = 'root';
-  static const String password = ' ';
-  static const String db = 'bd_ch2o';
-
-  Future<MySqlConnection> getConnection() async {
-    var settings = ConnectionSettings(
-      host: host,
-      port: port,
-      user: user,
-      password: password,
-      db: db,
-    );
-    return await MySqlConnection.connect(settings);
-  }
-
-  Future<bool> validateLogin() async {
-    var conn = await getConnection();
-    try {
-      var query = '''
-        SELECT * FROM usuario WHERE idcedula = ? AND contrasena = ?
-      ''';
-      var results = await conn.query(query, [_cedula, _contrasena]);
-      return results.isNotEmpty;
-    } finally {
-      await conn.close();
-    }
-  }
-
+class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.teal[100],
       appBar: AppBar(
-        title: Center(
-          child: Text(
-            'C_H2O Cafe',
-            style: TextStyle(
-              color: const Color.fromARGB(255, 193, 117, 117),
-            ),
-          ),
+        title: FutureBuilder(
+          future: getRegistro(),
+          builder: (context, snapshot) {
+            return Text(
+              'C_H2O Cafe',
+              style: TextStyle(
+                color: const Color.fromARGB(255, 193, 117, 117),
+              ),
+            );
+          },
         ),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20.0),
         child: Form(
-          key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -98,13 +77,6 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese su cédula';
-                  }
-                  return null;
-                },
-                onSaved: (value) => setState(() => _cedula = value!),
               ),
               SizedBox(height: 10.0),
               TextFormField(
@@ -116,31 +88,20 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese su contraseña';
-                  }
-                  return null;
-                },
-                onSaved: (value) => setState(() => _contrasena = value!),
               ),
-              SizedBox(height: 20.0),
+              SizedBox(height: 10.0),
               ElevatedButton(
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    var push = Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Menu()),
-                    );
-                  }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Menu()),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   backgroundColor: Colors.teal[700],
-                  padding: EdgeInsets.symmetric(vertical: 15.0),
                 ),
                 child: Text(
                   'Iniciar Sesión',
@@ -148,29 +109,33 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               SizedBox(height: 10.0),
-              TextButton(
+              ElevatedButton(
                 onPressed: () {
-                  var push = Navigator.push(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Registro()),
                   );
                 },
                 child: Text(
                   'Registrarse',
-                  style: TextStyle(fontSize: 16.0, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      color: const Color.fromARGB(255, 39, 11, 11)),
                 ),
               ),
               SizedBox(height: 10.0),
-              TextButton(
+              FloatingActionButton(
                 onPressed: () {
-                  var push = Navigator.push(
+                  Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => Registro()),
+                    MaterialPageRoute(builder: (context) => Pagina()),
                   );
                 },
                 child: Text(
                   'Recuperar Contraseña',
-                  style: TextStyle(fontSize: 16.0, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      color: const Color.fromARGB(255, 31, 9, 9)),
                 ),
               ),
             ],

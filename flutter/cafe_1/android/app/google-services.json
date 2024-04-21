@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "175886454401",
+    "project_id": "ch2o-4df5d",
+    "storage_bucket": "ch2o-4df5d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:175886454401:android:347f430a11caa14b3fc780",
+        "android_client_info": {
+          "package_name": "com.example.mob_lavado_cafe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvpBbVblzJStonyUXe5wSS8vmuBPA4_Bo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
