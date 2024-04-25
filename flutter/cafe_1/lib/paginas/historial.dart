@@ -3,24 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:cafe_1/services/firebase_services.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Pagina(), // Set the home property to Menu class
-    );
-  }
-}
-
 class Pagina extends StatefulWidget {
   const Pagina({
     super.key,
@@ -38,20 +20,32 @@ class _PaginaState extends State<Pagina> {
         title: const Text('Historial'),
       ),
       body: FutureBuilder(
-          future: getRegistro(),
+          future: getHistorial(),
           builder: ((context, snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
                 itemCount: snapshot.data?.length,
                 itemBuilder: (context, index) {
-                  return Text(snapshot.data?[index]['mail']);
+                  final item = snapshot.data![index];
+                  return Row(
+                    // Or another layout widget as needed
+                    children: [
+                      Text('cedula: ${item['cedula']}'),
+                      const SizedBox(width: 10),
+                      Text('nombre1: ${item['nombre1']}'),
+                      const SizedBox(width: 10),
+                      Text('nombre2: ${item['nombre2']}'),
+                      const SizedBox(width: 10),
+                    ],
+                  );
                 },
               );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+            } else if (snapshot.hasError) {
+              return Center(
+                  child: Text('Error: ${snapshot.error}')); // Handle errors
             }
+
+            return const Center(child: CircularProgressIndicator());
           })),
     );
   }

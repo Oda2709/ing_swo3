@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 FirebaseFirestore db = FirebaseFirestore.instance;
 
 //se ven todo los registros
-Future<List> getRegistro() async {
+Future<List> getHistorial() async {
   List registro = [];
   CollectionReference collectionReferenceRegistro = db.collection('registro');
 
@@ -13,4 +13,13 @@ Future<List> getRegistro() async {
   });
 
   return registro;
+}
+
+//crear usuario en la BD
+Future<void> addUsuarios(
+    {required String cedula, required String nombre1}) async {
+  await db.collection("registro").add({
+    "cedula": cedula,
+    "nombre1": nombre1,
+  });
 }
