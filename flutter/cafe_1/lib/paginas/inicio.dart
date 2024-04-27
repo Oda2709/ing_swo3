@@ -2,10 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:cafe_1/firebase_options.dart';
 import 'package:cafe_1/paginas/leer.dart';
+import 'package:cafe_1/services/firebase_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cafe_1/paginas/menu.dart';
 import 'package:cafe_1/paginas/registro.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 //editado para firebase Future
 
@@ -19,6 +22,11 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  TextEditingController cedulaController = TextEditingController();
+  TextEditingController claveAccesoController = TextEditingController();
+
+  String? _errorMessage;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,6 +48,11 @@ class _LoginState extends State<Login> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (_errorMessage != null)
+                Text(
+                  _errorMessage!,
+                  style: TextStyle(color: Colors.red),
+                ),
               SizedBox(height: 50.0),
               Center(
                 child: Image.asset(
@@ -48,44 +61,80 @@ class _LoginState extends State<Login> {
                 ),
               ),
               SizedBox(height: 30.0),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Cédula',
-                  hintText: 'Ingrese su número de cédula',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: cedulaController,
+                  decoration: InputDecoration(
+                    labelText: 'Cédula',
+                    hintText: 'Ingrese su número de cédula',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    //FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(30),
+                  ],
                 ),
               ),
               SizedBox(height: 10.0),
-              TextFormField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Contraseña',
-                  hintText: 'Ingrese su contraseña',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: claveAccesoController,
+                  decoration: InputDecoration(
+                    labelText: 'Contraseña',
+                    hintText: 'Ingrese su contraseña',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
+                  obscureText: true,
+                  keyboardType: TextInputType.text,
                 ),
               ),
               SizedBox(height: 20.0),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Menu()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  backgroundColor: Colors.teal[700],
-                ),
-                child: Text(
-                  'Iniciar Sesión',
-                  style: TextStyle(fontSize: 16.0, color: Colors.white),
-                ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                    child: const Text("Iniciar Sesión"),
+                    onPressed: () async {
+                      String cedula = cedulaController.text;
+                      String claveAcceso = claveAccesoController.text;
+
+                      if (cedula.isEmpty || claveAcceso.isEmpty) {
+                        setState(() {
+                          _errorMessage = "Todos los campos son obligatorios";
+                        });
+                        return;
+                      }
+
+                      try {
+                        await signInWithEmailAndPassword(cedula, claveAcceso);
+                        // Handle successful login (e.g., navigate to home screen)
+                        Navigator.pushNamed(context,
+                            '/'); // Replace with your home screen route
+                      } on FirebaseAuthException catch (e) {
+                        if (e.code == 'user-not-found') {
+                          setState(() {
+                            _errorMessage =
+                                'La cédula o clave de acceso incorrecta.';
+                          });
+                        } else if (e.code == 'wrong-password') {
+                          setState(() {
+                            _errorMessage = 'La clave de acceso incorrecta.';
+                          });
+                        } else {
+                          // Handle other Firebase errors
+                          print('Error desconocido: ${e.message}');
+                        }
+                      } catch (e) {
+                        // Handle non-Firebase errors
+                        print('Error no relacionado con Firebase: $e');
+                      }
+                    }),
               ),
               SizedBox(height: 10.0),
               ElevatedButton(

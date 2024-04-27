@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -45,7 +46,7 @@ Future<bool> verificarCedulaExistente(String cedula) async {
   return query.docs.isNotEmpty;
 }
 
-//actualizar usuario
+//Actualizar usuario
 Future<void> actualizarusuarios(
   String cedula,
   String newnombre1,
@@ -64,4 +65,23 @@ Future<void> actualizarusuarios(
     "residencia": newresidencia,
     "claveAcceso": newclaveAcceso,
   });
+}
+
+//Eliminar de la BD
+
+Future<void> eliminarusuarios(String cedula) async {
+  await db.collection("registro").doc(cedula).delete();
+}
+
+// Replace with your actual Firebase authentication logic
+Future<void> signInWithEmailAndPassword(
+    String cedula, String claveAcceso) async {
+  try {
+    final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: cedula,
+        password: claveAcceso); // Assuming cedula acts as email here
+  } on FirebaseAuthException catch (e) {
+    // Handle exceptions here (already handled in build method)
+    throw e;
+  }
 }

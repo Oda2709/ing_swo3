@@ -29,15 +29,20 @@ class _PaginaState extends State<Pagina> {
                   final item = snapshot.data![index];
                   //Delete
                   return Dismissible(
+                    //elimina de la BD
+                    onDismissed: (direction) async {
+                      await eliminarusuarios(item['cedula']);
+                    },
+
                     confirmDismiss: (direction) async {
                       bool result = false;
-
+                      // dialogo
                       result = await showDialog(
                         context: context,
                         builder: (context) {
                           return AlertDialog(
                             title: Text(
-                                "¿Está seguro de eliminar el registro ${item['cedula']}"),
+                                "¿Está seguro de eliminar el registro ${item['cedula']}?"),
                             actions: [
                               TextButton(
                                   onPressed: () {
@@ -46,7 +51,10 @@ class _PaginaState extends State<Pagina> {
                                       false,
                                     );
                                   },
-                                  child: const Text("Cancelar")),
+                                  child: const Text(
+                                    "Cancelar",
+                                    style: TextStyle(color: Colors.red),
+                                  )),
                               TextButton(
                                   onPressed: () {
                                     return Navigator.pop(
