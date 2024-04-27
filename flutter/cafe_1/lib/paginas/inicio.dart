@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:cafe_1/firebase_options.dart';
-import 'package:cafe_1/paginas/historial.dart';
+import 'package:cafe_1/paginas/leer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cafe_1/paginas/menu.dart';
 import 'package:cafe_1/paginas/registro.dart';
@@ -68,7 +68,7 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              SizedBox(height: 10.0),
+              SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
@@ -101,18 +101,16 @@ class _LoginState extends State<Login> {
                 ),
               ),
               SizedBox(height: 10.0),
-              FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Pagina()),
-                  );
+              ElevatedButton(
+                onPressed: () async {
+                  await Navigator.pushNamed(context, '/leer');
+                  setState(() {});
                 },
                 child: Text(
-                  'Recuperar Contraseña',
+                  'Listar usuarios',
                   style: TextStyle(
                       fontSize: 16.0,
-                      color: const Color.fromARGB(255, 31, 9, 9)),
+                      color: const Color.fromARGB(255, 39, 11, 11)),
                 ),
               ),
             ],

@@ -6,31 +6,46 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cafe_1/modelo/registro_Model.dart';
 import 'package:flutter/services.dart';
 
-class Registro extends StatefulWidget {
-  const Registro({
+class Actualizar extends StatefulWidget {
+  const Actualizar({
     super.key,
   });
 
   @override
-  State<Registro> createState() => _RegistroState();
+  State<Actualizar> createState() => _ActualizarState();
 }
 
-class _RegistroState extends State<Registro> {
-  TextEditingController cedulaController = TextEditingController();
-  TextEditingController nombre1Controller = TextEditingController();
-  TextEditingController nombre2Controller = TextEditingController();
-  TextEditingController apellido1Controller = TextEditingController();
-  TextEditingController apellido2Controller = TextEditingController();
-  TextEditingController residenciaController = TextEditingController();
-  TextEditingController clavedeaccesoController = TextEditingController();
+class _ActualizarState extends State<Actualizar> {
+  final TextEditingController cedulaController = TextEditingController();
+  final TextEditingController nombre1Controller = TextEditingController();
+  final TextEditingController nombre2Controller = TextEditingController();
+  final TextEditingController apellido1Controller = TextEditingController();
+  final TextEditingController apellido2Controller = TextEditingController();
+  final TextEditingController residenciaController = TextEditingController();
+  final TextEditingController claveAccesoController = TextEditingController();
 
   String? _errorMessage;
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic>? arguments =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+
+    if (arguments != null) {
+      cedulaController.text = arguments['cedula'] ?? '';
+      nombre1Controller.text = arguments['nombre1'] ?? '';
+      nombre2Controller.text = arguments['nombre2'] ?? '';
+      apellido1Controller.text = arguments['apellido1'] ?? '';
+      apellido2Controller.text = arguments['apellido2'] ?? '';
+      residenciaController.text = arguments['residencia'] ?? '';
+      claveAccesoController.text = arguments['claveAcceso'] ?? '';
+    }
+
+    print(arguments);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Registro de Usuarios'),
+        title: const Text('Actualización de Usuario'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -51,8 +66,12 @@ class _RegistroState extends State<Registro> {
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
                         controller: cedulaController,
+                        //no permite que la cedula sea editada
+                        readOnly: true,
                         decoration: const InputDecoration(
-                          hintText: 'Cédula (sin puntos)',
+                          prefixText:
+                              'La cedula no puede ser editada -> su cedula es: ',
+                          hintText: 'Cédula',
                         ),
                         keyboardType: TextInputType.number,
                         inputFormatters: [
@@ -66,7 +85,7 @@ class _RegistroState extends State<Registro> {
                       child: TextField(
                         controller: nombre1Controller,
                         decoration: const InputDecoration(
-                          hintText: 'Primer Nombre',
+                          hintText: 'Actualizar Primer Nombre',
                         ),
                         keyboardType: TextInputType.text,
                         inputFormatters: [
@@ -81,7 +100,7 @@ class _RegistroState extends State<Registro> {
                       child: TextField(
                         controller: nombre2Controller,
                         decoration: const InputDecoration(
-                          hintText: 'Segundo Nombre',
+                          hintText: 'Actualizar Segundo Nombre',
                         ),
                         keyboardType: TextInputType.text,
                         inputFormatters: [
@@ -96,7 +115,7 @@ class _RegistroState extends State<Registro> {
                       child: TextField(
                         controller: apellido1Controller,
                         decoration: const InputDecoration(
-                          hintText: 'Primer Apellido',
+                          hintText: 'Actualizar Primer Apellido',
                         ),
                         keyboardType: TextInputType.text,
                         inputFormatters: [
@@ -111,7 +130,7 @@ class _RegistroState extends State<Registro> {
                       child: TextField(
                         controller: apellido2Controller,
                         decoration: const InputDecoration(
-                          hintText: 'Segundo Apellido',
+                          hintText: 'Actualizar Segundo Apellido',
                         ),
                         keyboardType: TextInputType.text,
                         inputFormatters: [
@@ -126,7 +145,7 @@ class _RegistroState extends State<Registro> {
                       child: TextField(
                         controller: residenciaController,
                         decoration: const InputDecoration(
-                          hintText: 'Ciudad',
+                          hintText: 'Actualizar Ciudad',
                         ),
                         keyboardType: TextInputType.text,
                         inputFormatters: [
@@ -139,10 +158,13 @@ class _RegistroState extends State<Registro> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
-                        controller: clavedeaccesoController,
+                        controller: claveAccesoController,
+                        //no permite que la clave sea editada
+                        readOnly: true,
                         decoration: const InputDecoration(
-                          hintText:
-                              'Clave de acceso (Puede ser alfanumerica con minimo 8 y maximo 15)',
+                          prefixText:
+                              'La clave no puede ser editada -> su clave es: ',
+                          hintText: 'claveacceso',
                         ),
                         keyboardType: TextInputType.text,
                         inputFormatters: [
@@ -151,59 +173,38 @@ class _RegistroState extends State<Registro> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(8),
                       child: ElevatedButton(
-                          child: const Text("Registrar"),
+                          child: const Text("Actualizar"),
                           onPressed: () async {
-                            String cedula = cedulaController.text;
                             String nombre1 = nombre1Controller.text;
                             String nombre2 = nombre2Controller.text;
                             String apellido1 = apellido1Controller.text;
                             String apellido2 = apellido2Controller.text;
                             String residencia = residenciaController.text;
-                            String claveAcceso = clavedeaccesoController.text;
 
-                            if (cedula.isEmpty ||
-                                nombre1.isEmpty ||
+                            if (nombre1.isEmpty ||
                                 nombre2.isEmpty ||
                                 apellido1.isEmpty ||
                                 apellido2.isEmpty ||
-                                residencia.isEmpty ||
-                                claveAcceso.isEmpty) {
+                                residencia.isEmpty) {
                               setState(() {
                                 _errorMessage =
-                                    "Todos los campos son obligatorios";
-                              });
-                              return;
-                            }
-                            // Verificar si la cédula ya está registrada
-                            bool cedulaExiste =
-                                await verificarCedulaExistente(cedula);
-                            if (cedulaExiste) {
-                              setState(() {
-                                _errorMessage = "La cédula ya está registrada.";
-                              });
-                              return;
-                            }
-
-                            if (claveAcceso.length < 8) {
-                              setState(() {
-                                _errorMessage =
-                                    "La clave debe tener como minimo 8 caracteres";
+                                    "Dejo datos en blanco favor verificar antes de actualizar";
                               });
                               return;
                             }
 
                             try {
-                              // Agregar el usuario solo si la cédula no está registrada
-                              await addUsuarios(
-                                cedula: cedula,
-                                nombre1: nombre1,
-                                nombre2: nombre2,
-                                apellido1: apellido1,
-                                apellido2: apellido2,
-                                residencia: residencia,
-                                claveAcceso: claveAcceso,
+                              // Actualizar el usuario solo si la cédula no está registrada
+                              await actualizarusuarios(
+                                arguments?['cedula'],
+                                nombre1Controller.text,
+                                nombre2Controller.text,
+                                apellido1Controller.text,
+                                apellido2Controller.text,
+                                residenciaController.text,
+                                claveAccesoController.text,
                               );
 
                               // Mostrar mensaje de éxito
@@ -211,9 +212,9 @@ class _RegistroState extends State<Registro> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: const Text("Registro exitoso"),
+                                    title: const Text("Actualización exitosa"),
                                     content: const Text(
-                                        "El usuario ha sido registrado correctamente."),
+                                        "El usuario ha sido actualizado correctamente."),
                                     actions: <Widget>[
                                       TextButton(
                                         child: const Text("Aceptar"),
