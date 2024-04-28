@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:cafe_1/services/firebase_services.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cafe_1/modelo/registro_Model.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 class Registro extends StatefulWidget {
   const Registro({
@@ -23,6 +25,7 @@ class _RegistroState extends State<Registro> {
   TextEditingController apellido2Controller = TextEditingController();
   TextEditingController residenciaController = TextEditingController();
   TextEditingController clavedeaccesoController = TextEditingController();
+  TextEditingController correoController = TextEditingController();
 
   String? _errorMessage;
 
@@ -139,6 +142,19 @@ class _RegistroState extends State<Registro> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
+                        controller: correoController,
+                        decoration: const InputDecoration(
+                          hintText: 'Ingrese correo',
+                        ),
+                        keyboardType: TextInputType.text,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(30),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
                         controller: clavedeaccesoController,
                         decoration: const InputDecoration(
                           hintText:
@@ -162,6 +178,7 @@ class _RegistroState extends State<Registro> {
                             String apellido2 = apellido2Controller.text;
                             String residencia = residenciaController.text;
                             String claveAcceso = clavedeaccesoController.text;
+                            String correo = correoController.text;
 
                             if (cedula.isEmpty ||
                                 nombre1.isEmpty ||
@@ -169,19 +186,40 @@ class _RegistroState extends State<Registro> {
                                 apellido1.isEmpty ||
                                 apellido2.isEmpty ||
                                 residencia.isEmpty ||
-                                claveAcceso.isEmpty) {
+                                claveAcceso.isEmpty ||
+                                correo.isEmpty) {
                               setState(() {
                                 _errorMessage =
                                     "Todos los campos son obligatorios";
                               });
                               return;
                             }
+
                             // Verificar si la cédula ya está registrada
                             bool cedulaExiste =
                                 await verificarCedulaExistente(cedula);
                             if (cedulaExiste) {
                               setState(() {
                                 _errorMessage = "La cédula ya está registrada.";
+                              });
+                              return;
+                            }
+
+                            // Verificar si el correo ya está registrado
+                            bool correoExiste =
+                                await verificarCorreoExistente(correo);
+                            if (correoExiste) {
+                              setState(() {
+                                _errorMessage = "el correo ya está registrado.";
+                              });
+                              return;
+                            }
+
+                            // Validar el correo electrónico
+                            if (!EmailValidator.validate(correo)) {
+                              setState(() {
+                                _errorMessage =
+                                    "Ingrese una dirección de correo electrónico válida.";
                               });
                               return;
                             }
@@ -204,6 +242,7 @@ class _RegistroState extends State<Registro> {
                                 apellido2: apellido2,
                                 residencia: residencia,
                                 claveAcceso: claveAcceso,
+                                correo: correo,
                               );
 
                               // Mostrar mensaje de éxito

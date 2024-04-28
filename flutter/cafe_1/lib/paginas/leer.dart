@@ -18,10 +18,27 @@ class _PaginaState extends State<Pagina> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Historial'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(
+                  context, '/buscar'); // Navegar a la página de búsqueda
+            },
+            icon: Icon(Icons.search), // Icono de búsqueda
+          ),
+        ],
       ),
       body: FutureBuilder(
           future: getHistorial(),
           builder: ((context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
+            final historial = snapshot.data as List<Map<String, dynamic>>?;
+
             if (snapshot.hasData) {
               return ListView.builder(
                 itemCount: snapshot.data?.length,
@@ -31,7 +48,7 @@ class _PaginaState extends State<Pagina> {
                   return Dismissible(
                     //elimina de la BD
                     onDismissed: (direction) async {
-                      await eliminarusuarios(item['cedula']);
+                      await eliminarUsuario(item['cedula']);
                     },
 
                     confirmDismiss: (direction) async {
@@ -102,7 +119,9 @@ class _PaginaState extends State<Pagina> {
                             const SizedBox(width: 10),
                             Text('Ciudad: ${item['residencia']}'),
                             const SizedBox(width: 10),
-                            Text('clave de acceso: ${item['claveAcceso']}'),
+                            Text('Clave de acceso: ${item['claveAcceso']}'),
+                            const SizedBox(width: 10),
+                            Text('Correo electronico: ${item['correo']}'),
                             const SizedBox(width: 10),
                             //consultar si seagrega la clave
                           ],
@@ -121,6 +140,7 @@ class _PaginaState extends State<Pagina> {
                                     'apellido2': item['apellido2'],
                                     'residencia': item['residencia'],
                                     'claveAcceso': item['claveAcceso'],
+                                    'correo': item['correo'],
                                   });
                             },
                             child: const Icon(Icons.edit),
@@ -132,8 +152,7 @@ class _PaginaState extends State<Pagina> {
                 },
               );
             } else if (snapshot.hasError) {
-              return Center(
-                  child: Text('Error: ${snapshot.error}')); // Handle errors
+              return Center(child: Text('Error: ${snapshot.error}'));
             }
             return const Center(child: CircularProgressIndicator());
           })),

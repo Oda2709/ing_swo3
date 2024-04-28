@@ -22,7 +22,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  TextEditingController cedulaController = TextEditingController();
+  TextEditingController correoController = TextEditingController();
   TextEditingController claveAccesoController = TextEditingController();
 
   String? _errorMessage;
@@ -64,10 +64,10 @@ class _LoginState extends State<Login> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
-                  controller: cedulaController,
+                  controller: correoController,
                   decoration: InputDecoration(
-                    labelText: 'Cédula',
-                    hintText: 'Ingrese su número de cédula',
+                    labelText: 'Correo',
+                    hintText: 'Ingrese su correo electronico',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -99,42 +99,29 @@ class _LoginState extends State<Login> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                    child: const Text("Iniciar Sesión"),
-                    onPressed: () async {
-                      String cedula = cedulaController.text;
-                      String claveAcceso = claveAccesoController.text;
+                  child: const Text("Iniciar Sesión"),
+                  onPressed: () async {
+                    String correo = correoController.text;
+                    String claveAcceso = claveAccesoController.text;
 
-                      if (cedula.isEmpty || claveAcceso.isEmpty) {
-                        setState(() {
-                          _errorMessage = "Todos los campos son obligatorios";
-                        });
-                        return;
-                      }
+                    if (correo.isEmpty || claveAcceso.isEmpty) {
+                      setState(() {
+                        _errorMessage = "Todos los campos son obligatorios";
+                      });
+                      return;
+                    }
 
-                      try {
-                        await signInWithEmailAndPassword(cedula, claveAcceso);
-                        // Handle successful login (e.g., navigate to home screen)
-                        Navigator.pushNamed(context,
-                            '/'); // Replace with your home screen route
-                      } on FirebaseAuthException catch (e) {
-                        if (e.code == 'user-not-found') {
-                          setState(() {
-                            _errorMessage =
-                                'La cédula o clave de acceso incorrecta.';
-                          });
-                        } else if (e.code == 'wrong-password') {
-                          setState(() {
-                            _errorMessage = 'La clave de acceso incorrecta.';
-                          });
-                        } else {
-                          // Handle other Firebase errors
-                          print('Error desconocido: ${e.message}');
-                        }
-                      } catch (e) {
-                        // Handle non-Firebase errors
-                        print('Error no relacionado con Firebase: $e');
-                      }
-                    }),
+                    // Llama a la función de inicio de sesión
+                    try {
+                      await iniciarSesion(
+                          correo: correo, claveAcceso: claveAcceso);
+                    } catch (error) {
+                      setState(() {
+                        _errorMessage = "Error al iniciar sesión: $error";
+                      });
+                    }
+                  },
+                ),
               ),
               SizedBox(height: 10.0),
               ElevatedButton(

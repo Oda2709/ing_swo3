@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:cafe_1/paginas/actualizar.dart';
+import 'package:cafe_1/paginas/buscar.dart';
 import 'package:cafe_1/paginas/leer.dart';
 import 'package:cafe_1/paginas/inicio.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -37,6 +38,7 @@ class _MyAppState extends State<MyApp> {
         '/registro': (context) => const Registro(),
         '/leer': (context) => const Pagina(),
         '/actualizar': (context) => const Actualizar(),
+        '/buscar': (context) => const Buscar(),
       },
     );
   }

@@ -6,6 +6,7 @@ class User {
   final String apellido2;
   final String residencia;
   final String claveacceso;
+  final String correo;
   final bool confirmado;
 
   User(
@@ -16,6 +17,7 @@ class User {
       required this.apellido2,
       required this.residencia,
       required this.claveacceso,
+      required this.correo,
       required this.confirmado});
 
   User.empty({
@@ -26,6 +28,7 @@ class User {
     this.apellido2 = " ",
     this.residencia = " ",
     this.claveacceso = " ",
+    this.correo = " ",
     this.confirmado = false,
   });
 

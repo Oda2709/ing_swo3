@@ -23,6 +23,7 @@ class _ActualizarState extends State<Actualizar> {
   final TextEditingController apellido2Controller = TextEditingController();
   final TextEditingController residenciaController = TextEditingController();
   final TextEditingController claveAccesoController = TextEditingController();
+  final TextEditingController correoController = TextEditingController();
 
   String? _errorMessage;
 
@@ -39,6 +40,7 @@ class _ActualizarState extends State<Actualizar> {
       apellido2Controller.text = arguments['apellido2'] ?? '';
       residenciaController.text = arguments['residencia'] ?? '';
       claveAccesoController.text = arguments['claveAcceso'] ?? '';
+      correoController.text = arguments['correo'] ?? '';
     }
 
     print(arguments);
@@ -158,6 +160,19 @@ class _ActualizarState extends State<Actualizar> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
+                        controller: correoController,
+                        decoration: const InputDecoration(
+                          hintText: 'Se correo es correo',
+                        ),
+                        keyboardType: TextInputType.text,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(30),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
                         controller: claveAccesoController,
                         //no permite que la clave sea editada
                         readOnly: true,
@@ -205,6 +220,7 @@ class _ActualizarState extends State<Actualizar> {
                                 apellido2Controller.text,
                                 residenciaController.text,
                                 claveAccesoController.text,
+                                correoController.text,
                               );
 
                               // Mostrar mensaje de éxito
